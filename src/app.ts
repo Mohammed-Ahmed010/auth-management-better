@@ -1,11 +1,19 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
-
+import { requireAuth } from "./middlewares/auth";
+import authRouter from "./routes/auth";
+import morgan from "morgan";
 dotenv.config();
 
-const PORT = 3000;
 const app = express();
-
-app.listen(PORT, () => {
-	console.log(`Server started running at ${PORT}`);
+app.use(express.json());
+app.use(morgan("dev"));
+app.use("/", authRouter);
+app.get("/", (req: Request, res: Response) => {
+	return res.send("home");
 });
+app.get("/profile", requireAuth, (req: Request, res: Response) => {
+	return res.send("hiii");
+});
+
+export default app;
