@@ -3,6 +3,7 @@ import { hashPassword, verifyPassword } from "../auth/password";
 import prisma from "../db/client";
 import { Request, Response } from "express";
 import { userRegistration, userLogin } from "../types/auth";
+import passport from "../auth/passport";
 
 export async function handleUserRegistration(req: Request, res: Response) {
 	const credentials: userRegistration = req.body;
@@ -60,4 +61,14 @@ export async function handleUserLogin(req: Request, res: Response) {
 	} catch (err) {
 		res.status(500).json({ error: "login failed" });
 	}
+}
+
+export function handleGoogleCallback(req: Request, res: Response) {
+	//	@ts-ignore
+	const user = req.user;
+	if (!user) {
+		return res.status(400).json({ error: "User not found" });
+	}
+	const token = signJWT({ userId: (user as any).id });
+	return res.json({ token });
 }
